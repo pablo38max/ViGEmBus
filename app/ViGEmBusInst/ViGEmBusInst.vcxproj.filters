@@ -18,5 +18,22 @@
     <ClCompile Include="ViGEmBusInst.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Devcon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="argh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="colorwin.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Devcon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ViGEmBusInst.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
