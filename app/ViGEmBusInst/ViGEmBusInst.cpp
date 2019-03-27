@@ -6,7 +6,7 @@
 
 int main()
 {
-    auto t = devcon::refresh();
+    
 
     //auto t = devcon::remove(&GUID_DEVINTERFACE_BUSENUM_VIGEM, L"ROOT\\SYSTEM\\0001");
 }
