@@ -3,6 +3,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <SetupAPI.h>
+#include <cfgmgr32.h>
 
 bool devcon::create(std::wstring className, const GUID *classGuid, std::wstring hardwareId)
 {
@@ -96,4 +97,19 @@ bool devcon::remove(const GUID *classGuid, std::wstring instanceId)
         SetupDiDestroyDeviceInfoList(deviceInfoSet);
 
     return retval;
+}
+
+bool devcon::refresh()
+{
+    DEVINST dinst;
+
+    if (CM_Locate_DevNode_Ex(
+        &dinst,
+        nullptr,
+        0,
+        nullptr
+    ) != CR_SUCCESS
+        ) return false;
+
+    return CM_Reenumerate_DevNode_Ex(dinst, 0, nullptr) == CR_SUCCESS;
 }

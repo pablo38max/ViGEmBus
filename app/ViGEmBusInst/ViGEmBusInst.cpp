@@ -6,7 +6,9 @@
 
 int main()
 {
-    auto t = devcon::remove(&GUID_DEVINTERFACE_BUSENUM_VIGEM, L"ROOT\\SYSTEM\\0001");
+    auto t = devcon::refresh();
+
+    //auto t = devcon::remove(&GUID_DEVINTERFACE_BUSENUM_VIGEM, L"ROOT\\SYSTEM\\0001");
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
