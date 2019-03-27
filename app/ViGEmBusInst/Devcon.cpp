@@ -115,7 +115,7 @@ bool devcon::refresh()
     return CM_Reenumerate_DevNode_Ex(dinst, 0, nullptr) == CR_SUCCESS;
 }
 
-bool devcon::update(std::wstring hardwareId, std::wstring infPath, bool& rebootRequired)
+bool devcon::update(const std::wstring& hardwareId, const std::wstring& infPath, bool& rebootRequired)
 {
     BOOL reboot = FALSE;
 
@@ -124,6 +124,22 @@ bool devcon::update(std::wstring hardwareId, std::wstring infPath, bool& rebootR
         hardwareId.c_str(),
         infPath.c_str(),
         INSTALLFLAG_FORCE | INSTALLFLAG_NONINTERACTIVE,
+        &reboot
+    );
+
+    rebootRequired = (reboot == TRUE);
+
+    return ret;
+}
+
+bool devcon::install(const std::wstring& infPath, bool & rebootRequired)
+{
+    BOOL reboot = FALSE;
+
+    const auto ret =  DiInstallDriver(
+        nullptr, 
+        infPath.c_str(),
+        DIIRFLAG_FORCE_INF, 
         &reboot
     );
 

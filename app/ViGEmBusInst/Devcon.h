@@ -11,5 +11,7 @@ namespace devcon
 
     bool refresh();
 
-    bool update(std::wstring hardwareId, std::wstring infPath, bool& rebootRequired);
+    bool update(const std::wstring& hardwareId, const std::wstring& infPath, bool& rebootRequired);
+
+    bool install(const std::wstring& infPath, bool& rebootRequired);
 };
