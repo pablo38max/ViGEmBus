@@ -60,3 +60,40 @@ bool devcon::create(std::wstring className, const GUID *classGuid, std::wstring 
 
     return true;
 }
+
+bool devcon::remove(const GUID *classGuid, std::wstring instanceId)
+{
+    auto retval = false;
+
+    SP_DEVINFO_DATA deviceInfoData;
+    deviceInfoData.cbSize = sizeof(deviceInfoData);
+
+    auto deviceInfoSet = SetupDiGetClassDevs(classGuid, nullptr, nullptr,
+        DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
+
+    if (SetupDiOpenDeviceInfo(deviceInfoSet, instanceId.c_str(), nullptr, 0, &deviceInfoData))
+    {
+        SP_CLASSINSTALL_HEADER spCih;
+        spCih.cbSize = sizeof(SP_CLASSINSTALL_HEADER);
+        spCih.InstallFunction = DIF_REMOVE;
+
+        SP_REMOVEDEVICE_PARAMS spRdp;
+        spRdp.ClassInstallHeader = spCih;
+        spRdp.HwProfile = 0x00;
+        spRdp.Scope = DI_REMOVEDEVICE_GLOBAL;
+
+        if (SetupDiSetClassInstallParams(
+            deviceInfoSet,
+            &deviceInfoData,
+            &spRdp.ClassInstallHeader,
+            sizeof(SP_REMOVEDEVICE_PARAMS)))
+        {
+            retval = SetupDiCallClassInstaller(DIF_REMOVE, deviceInfoSet, &deviceInfoData);
+        }
+    }
+
+    if (deviceInfoSet)
+        SetupDiDestroyDeviceInfoList(deviceInfoSet);
+
+    return retval;
+}
