@@ -12,7 +12,7 @@
 
 bool devcon::create(std::wstring className, const GUID *classGuid, std::wstring hardwareId)
 {
-    auto deviceInfoSet = SetupDiCreateDeviceInfoList(classGuid, nullptr);
+    const auto deviceInfoSet = SetupDiCreateDeviceInfoList(classGuid, nullptr);
 
     if (INVALID_HANDLE_VALUE == deviceInfoSet)
         return false;
@@ -20,7 +20,7 @@ bool devcon::create(std::wstring className, const GUID *classGuid, std::wstring 
     SP_DEVINFO_DATA deviceInfoData;
     deviceInfoData.cbSize = sizeof(deviceInfoData);
 
-    auto cdiRet = SetupDiCreateDeviceInfo(
+    const auto cdiRet = SetupDiCreateDeviceInfo(
         deviceInfoSet,
         className.c_str(),
         classGuid,
@@ -36,7 +36,7 @@ bool devcon::create(std::wstring className, const GUID *classGuid, std::wstring 
         return false;
     }
 
-    auto sdrpRet = SetupDiSetDeviceRegistryProperty(
+    const auto sdrpRet = SetupDiSetDeviceRegistryProperty(
         deviceInfoSet,
         &deviceInfoData,
         SPDRP_HARDWAREID,
@@ -74,8 +74,11 @@ bool devcon::remove(const GUID *classGuid, std::wstring instanceId)
     SP_DEVINFO_DATA deviceInfoData;
     deviceInfoData.cbSize = sizeof(deviceInfoData);
 
-    auto deviceInfoSet = SetupDiGetClassDevs(classGuid, nullptr, nullptr,
+    const auto deviceInfoSet = SetupDiGetClassDevs(classGuid, nullptr, nullptr,
         DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
+
+    if (INVALID_HANDLE_VALUE == deviceInfoSet)
+        return false;
 
     if (SetupDiOpenDeviceInfo(deviceInfoSet, instanceId.c_str(), nullptr, 0, &deviceInfoData))
     {
@@ -167,6 +170,9 @@ bool devcon::find(const GUID *classGuid, std::wstring & devicePath, std::wstring
         nullptr,
         DIGCF_PRESENT | DIGCF_DEVICEINTERFACE
     );
+
+    if (INVALID_HANDLE_VALUE == deviceInfoSet)
+        return false;
 
     while (SetupDiEnumDeviceInterfaces(
         deviceInfoSet,
