@@ -10,4 +10,6 @@ namespace devcon
     bool remove(const GUID *classGuid, std::wstring instanceId);
 
     bool refresh();
+
+    bool update(std::wstring hardwareId, std::wstring infPath, bool& rebootRequired);
 };

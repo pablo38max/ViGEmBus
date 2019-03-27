@@ -4,6 +4,7 @@
 #include <Windows.h>
 #include <SetupAPI.h>
 #include <cfgmgr32.h>
+#include <newdev.h>
 
 bool devcon::create(std::wstring className, const GUID *classGuid, std::wstring hardwareId)
 {
@@ -112,4 +113,21 @@ bool devcon::refresh()
         ) return false;
 
     return CM_Reenumerate_DevNode_Ex(dinst, 0, nullptr) == CR_SUCCESS;
+}
+
+bool devcon::update(std::wstring hardwareId, std::wstring infPath, bool& rebootRequired)
+{
+    BOOL reboot = FALSE;
+
+    const auto ret = UpdateDriverForPlugAndPlayDevices(
+        nullptr,
+        hardwareId.c_str(),
+        infPath.c_str(),
+        INSTALLFLAG_FORCE | INSTALLFLAG_NONINTERACTIVE,
+        &reboot
+    );
+
+    rebootRequired = (reboot == TRUE);
+
+    return ret;
 }
