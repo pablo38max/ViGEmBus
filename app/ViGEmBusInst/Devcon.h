@@ -14,4 +14,6 @@ namespace devcon
     bool update(const std::wstring& hardwareId, const std::wstring& infPath, bool& rebootRequired);
 
     bool install(const std::wstring& infPath, bool& rebootRequired);
+
+    bool find(const GUID *classGuid, std::wstring& devicePath, std::wstring& instanceId, int instance = 0);
 };

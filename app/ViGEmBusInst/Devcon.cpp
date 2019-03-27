@@ -6,6 +6,10 @@
 #include <cfgmgr32.h>
 #include <newdev.h>
 
+#include <cwctype>
+#include <string>
+#include <algorithm>
+
 bool devcon::create(std::wstring className, const GUID *classGuid, std::wstring hardwareId)
 {
     auto deviceInfoSet = SetupDiCreateDeviceInfoList(classGuid, nullptr);
@@ -136,14 +140,98 @@ bool devcon::install(const std::wstring& infPath, bool & rebootRequired)
 {
     BOOL reboot = FALSE;
 
-    const auto ret =  DiInstallDriver(
-        nullptr, 
+    const auto ret = DiInstallDriver(
+        nullptr,
         infPath.c_str(),
-        DIIRFLAG_FORCE_INF, 
+        DIIRFLAG_FORCE_INF,
         &reboot
     );
 
     rebootRequired = (reboot == TRUE);
 
     return ret;
+}
+
+bool devcon::find(const GUID *classGuid, std::wstring & devicePath, std::wstring & instanceId, int instance)
+{
+    SP_DEVICE_INTERFACE_DATA deviceInterfaceData;
+    deviceInterfaceData.cbSize = sizeof(SP_DEVICE_INTERFACE_DATA);
+    SP_DEVINFO_DATA da;
+    da.cbSize = sizeof(SP_DEVINFO_DATA);
+    DWORD bufferSize = 0, memberIndex = 0;
+    bool retval = false;
+
+    const auto deviceInfoSet = SetupDiGetClassDevs(
+        classGuid,
+        nullptr,
+        nullptr,
+        DIGCF_PRESENT | DIGCF_DEVICEINTERFACE
+    );
+
+    while (SetupDiEnumDeviceInterfaces(
+        deviceInfoSet,
+        nullptr,
+        classGuid,
+        memberIndex,
+        &deviceInterfaceData))
+    {
+        // Fetch required buffer size
+        SetupDiGetDeviceInterfaceDetail(
+            deviceInfoSet,
+            &deviceInterfaceData,
+            nullptr,
+            0,
+            &bufferSize,
+            &da
+        );
+
+        const auto detailDataBuffer = PSP_DEVICE_INTERFACE_DETAIL_DATA(malloc(bufferSize));
+        detailDataBuffer->cbSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA);
+
+        // Make request with correct buffer size
+        if (SetupDiGetDeviceInterfaceDetail(
+            deviceInfoSet,
+            &deviceInterfaceData,
+            detailDataBuffer,
+            bufferSize,
+            &bufferSize,
+            &da)
+            )
+        {
+            devicePath = std::wstring(detailDataBuffer->DevicePath);
+            std::transform(
+                devicePath.begin(),
+                devicePath.end(),
+                devicePath.begin(),
+                std::towupper
+            );
+
+            if (memberIndex == instance)
+            {
+                const auto instanceBuffer = PWSTR(malloc(MAX_PATH));
+
+                CM_Get_Device_ID(deviceInterfaceData.Flags, instanceBuffer, MAX_PATH, 0);
+
+                instanceId = std::wstring(instanceBuffer);
+                std::transform(
+                    instanceId.begin(),
+                    instanceId.end(),
+                    instanceId.begin(),
+                    std::towupper
+                );
+
+                free(instanceBuffer);
+                retval = true;
+            }
+        }
+
+        free(detailDataBuffer);
+
+        memberIndex++;
+    }
+
+    if (deviceInfoSet)
+        SetupDiDestroyDeviceInfoList(deviceInfoSet);
+
+    return retval;
 }
