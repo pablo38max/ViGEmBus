@@ -216,7 +216,7 @@ bool devcon::find(const GUID *classGuid, std::wstring & devicePath, std::wstring
             {
                 const auto instanceBuffer = PWSTR(malloc(MAX_PATH));
 
-                CM_Get_Device_ID(deviceInterfaceData.Flags, instanceBuffer, MAX_PATH, 0);
+                CM_Get_Device_ID(da.DevInst, instanceBuffer, MAX_PATH, 0);
 
                 instanceId = std::wstring(instanceBuffer);
                 std::transform(
