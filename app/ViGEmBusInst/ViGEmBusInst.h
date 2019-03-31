@@ -30,3 +30,8 @@
 #include "colorwin.hpp"
 
 #include "Devcon.h"
+
+namespace strconv
+{
+    std::wstring multi2wide(const std::string& str, UINT codePage = CP_THREAD_ACP);
+};
