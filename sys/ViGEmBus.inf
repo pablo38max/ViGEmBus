@@ -33,8 +33,8 @@
 
 [Version]
 Signature="$WINDOWS NT$"
-Class=System
-ClassGuid={4D36E97D-E325-11CE-BFC1-08002BE10318}
+Class=USB
+ClassGuid={36fc9e60-c465-11cf-8056-444553540000}
 Provider=%ManufacturerName%
 CatalogFile=ViGEmBus.cat
 DriverVer= ;

@@ -57,6 +57,9 @@
     <ClInclude Include="Queue.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="UsbHci.hpp">
+      <Filter>Header Files\Targets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="XusbPdo.cpp">
@@ -78,6 +81,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Driver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UsbHci.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

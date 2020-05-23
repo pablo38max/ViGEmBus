@@ -36,6 +36,7 @@
 #include "busenum.h"
 #include "driver.tmh"
 #include <wdmguid.h>
+#include <usbiodef.h>
 
 #ifdef ALLOC_PRAGMA
 #pragma alloc_text (INIT, DriverEntry)
@@ -241,6 +242,17 @@ NTSTATUS Bus_EvtDeviceAdd(IN WDFDRIVER Driver, IN PWDFDEVICE_INIT DeviceInit)
 #pragma region Expose FDO interface
 
     status = WdfDeviceCreateDeviceInterface(device, &GUID_DEVINTERFACE_BUSENUM_VIGEM, NULL);
+
+    if (!NT_SUCCESS(status))
+    {
+        TraceEvents(TRACE_LEVEL_ERROR,
+            TRACE_DRIVER,
+            "WdfDeviceCreateDeviceInterface failed with status %!STATUS!",
+            status);
+        return status;
+    }
+
+    status = WdfDeviceCreateDeviceInterface(device, &GUID_DEVINTERFACE_USB_HOST_CONTROLLER, NULL);
 
     if (!NT_SUCCESS(status))
     {

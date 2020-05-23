@@ -33,12 +33,15 @@
 */
 
 
+
 #include "busenum.h"
 #include "queue.tmh"
+#include <usbioctl.h>
 
 #include "EmulationTargetPDO.hpp"
 #include "XusbPdo.hpp"
 #include "Ds4Pdo.hpp"
+#include "UsbHci.hpp"
 
 
 using ViGEm::Bus::Core::PDO_IDENTIFICATION_DESCRIPTION;
@@ -74,7 +77,7 @@ VOID Bus_EvtIoDeviceControl(
 	Device = WdfIoQueueGetDevice(Queue);
 
 	TraceDbg(TRACE_QUEUE, "%!FUNC! Entry (device: 0x%p)", Device);
-
+		
 	switch (IoControlCode)
 	{
 #pragma region IOCTL_VIGEM_CHECK_VERSION
@@ -386,8 +389,28 @@ VOID Bus_EvtIoDeviceControl(
 
 #pragma endregion
 
-	default:
+#ifdef VIGEM_USB_HCI
+		
+	case IOCTL_GET_HCD_DRIVERKEY_NAME:
 
+		TraceDbg(TRACE_QUEUE, "IOCTL_GET_HCD_DRIVERKEY_NAME");
+
+		status = UsbHci_GetHcdDriverkeyName(Device, Request, &length);
+
+		break;
+
+	case IOCTL_USB_GET_ROOT_HUB_NAME:
+
+		TraceDbg(TRACE_QUEUE, "IOCTL_USB_GET_ROOT_HUB_NAME");
+
+		status = UsbHci_GetRootHubName(Device, Request, &length);
+		
+		break;
+
+#endif
+		
+	default:
+		
 		TraceEvents(TRACE_LEVEL_WARNING,
 		            TRACE_QUEUE,
 		            "Unknown I/O control code 0x%X", IoControlCode);
